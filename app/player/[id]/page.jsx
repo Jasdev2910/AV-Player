@@ -1,6 +1,6 @@
 "use client";
 import { Appbar } from "@/components/Appbar";
-import ParticlesComponent from "@/components/particles";
+import ParticlesComponent from "@/components/Particles";
 // import MediaPlayer from "@/components/Player/MediaPlayer";
 import dynamic from "next/dynamic";
 import { useParams } from "next/navigation";
