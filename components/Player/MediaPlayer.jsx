@@ -3,18 +3,17 @@
 import { useSelector, useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 const DynamicPlayer = dynamic(() => import("./index"), {
-  ssr: false, // This will only render the component on the client-side
+  ssr: false,
 });
 
 export default function MediaPlayer({ url }) {
   const router = useRouter();
-  const mediaFiles = useSelector((state) => state.media.mediaFiles); // Accessing media files from the store
-  const [currentIndex, setCurrentIndex] = useState(0); // Current media index
+  const mediaFiles = useSelector((state) => state.media.mediaFiles);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Find the initial index and setup
   useEffect(() => {
     const initialIndex = mediaFiles.findIndex((file) => file.url === url);
     if (initialIndex !== -1) {
@@ -22,25 +21,47 @@ export default function MediaPlayer({ url }) {
     }
   }, [url, mediaFiles]);
 
-  const navigateMedia = (index) => {
-    if (index >= 0 && index < mediaFiles.length) {
-      router.push(`/player/${encodeURIComponent(mediaFiles[index].url)}`);
-    }
-  };
+  const navigateMedia = useCallback(
+    (index) => {
+      if (index >= 0 && index < mediaFiles.length) {
+        router.push(`/player/${encodeURIComponent(mediaFiles[index].url)}`);
+      }
+    },
+    [mediaFiles, router]
+  );
 
-  const playNext = () => {
-    const nextIndex = (currentIndex + 1) % mediaFiles.length; // Wrap around the array
+  const playNext = useCallback(() => {
+    const nextIndex = (currentIndex + 1) % mediaFiles.length;
     navigateMedia(nextIndex);
-  };
+  }, [currentIndex, mediaFiles.length, navigateMedia]);
 
-  const playPrevious = () => {
+  const playPrevious = useCallback(() => {
     const prevIndex =
-      (currentIndex - 1 + mediaFiles.length) % mediaFiles.length; // Wrap around to the last if at the first item
+      (currentIndex - 1 + mediaFiles.length) % mediaFiles.length;
     navigateMedia(prevIndex);
-  };
+  }, [currentIndex, mediaFiles.length, navigateMedia]);
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      switch (event.key) {
+        case "N":
+        case "n":
+          playNext();
+          break;
+        case "P":
+        case "p":
+          playPrevious();
+          break;
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [playNext, playPrevious]);
 
   return (
-    <div className="flex justify-center items-center mt-16 ">
+    <div className="flex justify-center items-center mt-8">
+      <h1 className="text-white">Media Player</h1>
       <DynamicPlayer
         url={url}
         onPlayNext={playNext}
@@ -49,40 +70,3 @@ export default function MediaPlayer({ url }) {
     </div>
   );
 }
-
-// import dynamic from "next/dynamic";
-// import { useState } from "react";
-
-// const DynamicPlayer = dynamic(() => import("./index"), {
-//   ssr: false, // This will only render the component on the client-side
-// });
-
-// export default function MediaPlayer({ url }) {
-//   // const [currentIndex, setCurrentIndex] = useState(0); // Current media index
-//   // const [url, setUrl] = useState(mediaFiles[currentIndex]); // URL to play
-
-//   // const playNext = () => {
-//   //   const nextIndex = (currentIndex + 1) % mediaFiles.length; // Wrap around the array
-//   //   setCurrentIndex(nextIndex);
-//   //   setUrl(mediaFiles[nextIndex]);
-//   // };
-
-//   // const playPrevious = () => {
-//   //   const prevIndex =
-//   //     (currentIndex - 1 + mediaFiles.length) % mediaFiles.length; // Wrap around to the last if at the first item
-//   //   setCurrentIndex(prevIndex);
-//   //   setUrl(mediaFiles[prevIndex]);
-//   // };
-
-//   return (
-//     <div>
-//       <h1>Media Player</h1>
-
-//       <DynamicPlayer
-//         url={url}
-//         // onPlayNext={playNext}
-//         // onPlayPrevious={playPrevious}
-//       />
-//     </div>
-//   );
-// }

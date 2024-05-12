@@ -6,10 +6,8 @@ import usePlayerControls from "../../hooks/usePlayerControls";
 import { CgArrowsExpandRight, CgPlayButtonO } from "react-icons/cg";
 import { FaCompress, FaPauseCircle } from "react-icons/fa";
 import { MdForward10, MdReplay10 } from "react-icons/md";
-import { FaVolumeHigh } from "react-icons/fa6";
-import { FaVolumeXmark } from "react-icons/fa6";
-import { BiSkipPrevious } from "react-icons/bi";
-import { BiSkipNext } from "react-icons/bi";
+import { FaVolumeHigh, FaVolumeXmark } from "react-icons/fa6";
+import { BiSkipPrevious, BiSkipNext } from "react-icons/bi";
 
 const Player = ({ url, onPlayNext, onPlayPrevious }) => {
   const containerRef = useRef(null);
@@ -29,48 +27,47 @@ const Player = ({ url, onPlayNext, onPlayPrevious }) => {
     seek,
     toggleFullscreen,
     isFullscreen,
+    controlsVisible,
   } = usePlayerControls(playerRef, containerRef);
 
   useEffect(() => {
-    // Reload the media source when URL changes
     playerRef.current.load();
   }, [url]);
+
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
-  const [showTools, setShowTools] = useState(false);
 
   const handleVolumeChange = (e) => {
     changeVolume(parseFloat(e.target.value));
   };
 
-  const isMediaFile = isAudio(url) || isVideo(url); // Check if the URL is either video or audio
+  const isMediaFile = isAudio(url) || isVideo(url);
 
   return (
     <div
       ref={containerRef}
-      onMouseEnter={() => setShowTools(true)}
-      onMouseLeave={() =>
-        setTimeout(() => {
-          setShowTools(false);
-        }, 2000)
-      }
+      onMouseEnter={() => setShowVolumeSlider(true)}
+      onMouseLeave={() => setShowVolumeSlider(false)}
       className="max-w-3xl mx-auto w-full text-center text-white bg-[rgba(17,25,40,0.56)] backdrop-blur-[15px] backdrop-saturate-200 rounded-lg border border-[rgba(255,255,255,0.125)]"
     >
-      <h1 className="text-white">Media Player</h1>
       {isMediaFile && (
         <div className={"aspect-w-16 aspect-h-9 bg-black relative"}>
           <div
             onClick={togglePlayPause}
             className="w-full h-full bg-transparent absolute z-10"
           ></div>
-          <video ref={playerRef} className="w-full h-full" playsInline>
+          <video
+            ref={playerRef}
+            autoPlay="true"
+            className="w-full h-full"
+            playsInline
+          >
             <source src={url} type={isAudio(url) ? "audio/mp3" : "video/mp4"} />
             Your browser does not support the video element.
           </video>
-          {showTools && (
+          {controlsVisible && (
             <div className="absolute w-full -mt-14 bg-transparent text-white z-20">
               <div className="flex items-center px-2">
                 <input
-                  id="small-range"
                   type="range"
                   min="0"
                   max={duration}
@@ -88,7 +85,7 @@ const Player = ({ url, onPlayNext, onPlayPrevious }) => {
                     <BiSkipPrevious size={32} />
                   </button>
                   <button onClick={togglePlayPause} className="text-3xl">
-                    {playing ? <CgPlayButtonO /> : <FaPauseCircle />}
+                    {playing ? <FaPauseCircle /> : <CgPlayButtonO />}
                   </button>
                   <button onClick={onPlayNext}>
                     <BiSkipNext size={32} />
@@ -109,7 +106,6 @@ const Player = ({ url, onPlayNext, onPlayPrevious }) => {
                     </button>
                     {showVolumeSlider && (
                       <input
-                        id="small-range"
                         type="range"
                         min="0"
                         max="1"
@@ -130,7 +126,7 @@ const Player = ({ url, onPlayNext, onPlayPrevious }) => {
                     className="bg-transparent text-white p-1 rounded"
                   >
                     {[0.5, 0.75, 1, 1.25, 1.5, 2, 3, 4].map((rate) => (
-                      <option className="text-black" key={rate} value={rate}>
+                      <option key={rate} value={rate}>
                         {rate}x
                       </option>
                     ))}
