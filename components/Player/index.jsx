@@ -53,8 +53,9 @@ const Player = ({ url, onPlayNext, onPlayPrevious }) => {
           setShowTools(false);
         }, 2000)
       }
-      className="max-w-2xl h-12 mx-auto w-full"
+      className="max-w-3xl mx-auto w-full text-center text-white bg-[rgba(17,25,40,0.56)] backdrop-blur-[15px] backdrop-saturate-200 rounded-lg border border-[rgba(255,255,255,0.125)]"
     >
+      <h1 className="text-white">Media Player</h1>
       {isMediaFile && (
         <div className={"aspect-w-16 aspect-h-9 bg-black relative"}>
           <div

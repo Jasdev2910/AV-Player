@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+const plugin = require("tailwindcss/plugin");
+
 module.exports = {
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -14,5 +16,15 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    require("tailwindcss-filters"),
+    plugin(function ({ addUtilities }) {
+      const newUtilities = {
+        ".backdrop-saturate-200": {
+          backdropFilter: "saturate(200%)",
+        },
+      };
+      addUtilities(newUtilities, ["responsive", "hover"]);
+    }),
+  ],
 };
