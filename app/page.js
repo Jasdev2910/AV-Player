@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 import Link from "next/link";
 import { setMediaFiles } from "../utils/mediaSlice"; // Ensure you have this action creator properly defined
 import "./globals.css";
-import ParticlesComponent from "@/components/particles";
+import ParticlesComponent from "@/components/Particles";
 import { Appbar } from "@/components/Appbar";
 
 export default function HomePage() {
